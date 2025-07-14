@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-Angular from zero
+app.routes.ts
 "
 git push gitea
 git push github
