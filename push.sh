@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-files creation
+les étapes à suivre
 "
 git push gitea
 git push github
