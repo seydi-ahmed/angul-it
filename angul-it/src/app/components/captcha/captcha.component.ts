@@ -2,10 +2,12 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProgressService } from '../../services/progress.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-captcha',
   standalone: true,
+  imports: [CommonModule],  // <-- ajouter cette ligne
   templateUrl: './captcha.component.html',
   styleUrls: ['./captcha.component.scss'],
   providers: [ProgressService]

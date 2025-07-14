@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProgressService } from '../../services/progress.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-result',
   standalone: true,
+  imports: [CommonModule],  // <-- ajouter cette ligne
   templateUrl: './result.component.html',
   styleUrls: ['./result.component.scss'],
   providers: [ProgressService]
