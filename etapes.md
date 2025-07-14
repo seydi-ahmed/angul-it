@@ -1,70 +1,92 @@
-// -------------------------
-// PART 1: Project Initialization
-// -------------------------
+## --- PHASE 1: Création du projet Angular ---
 
-// Command Line Commands
-
-// 1. Install Angular CLI globally (if not done already)
+```bash
+# Installer Angular CLI si ce n'est pas déjà fait
 npm install -g @angular/cli
 
-// 2. Create a new Angular project
-ng new Angul-it --routing --style=scss
+# Créer un nouveau projet Angular
+ng new angul-it --routing --style=scss
 
-// Choose: Yes for routing, SCSS for styles.
+# Se déplacer dans le dossier du projet
+cd angul-it
 
-cd Angul-it
+# Créer les composants nécessaires
+ng generate component components/home
+ng generate component components/captcha
+ng generate component components/result
 
-// 3. Add Angular Material (optional but useful)
-ng add @angular/material
+# Créer un service pour la gestion d'état
+ng generate service services/progress
+```
 
-// 4. Install dependencies for state management and persistence
-npm install @ngrx/store @ngrx/store-devtools @ngrx/effects @ngrx/router-store @ngrx/entity
-npm install @ngrx/store-localstorage
+## --- PHASE 2: Structure des fichiers ---
 
-// 5. Generate core components
-ng generate component pages/home
-ng generate component pages/captcha
-ng generate component pages/result
-ng generate service services/state
-ng generate guard guards/challenge-complete
+Voici l’arborescence principale avec les fichiers pertinents (modifiés ou créés).
 
-// -------------------------
-// PART 2: Project Structure
-// -------------------------
-// src/
-// └── app/
-//     ├── app-routing.module.ts
-//     ├── app.module.ts
-//     ├── app.component.ts/html/scss
-//     ├── pages/
-//     │   ├── home/
-//     │   ├── captcha/
-//     │   └── result/
-//     ├── services/
-//     │   └── state.service.ts
-//     ├── guards/
-//     │   └── challenge-complete.guard.ts
-//     ├── store/
-//         ├── actions/
-//         ├── reducers/
-//         └── state.model.ts
+```
+src/
+├── app/
+│   ├── components/
+│   │   ├── home/
+│   │   │   ├── home.component.ts
+│   │   │   ├── home.component.html
+│   │   ├── captcha/
+│   │   │   ├── captcha.component.ts
+│   │   │   ├── captcha.component.html
+│   │   ├── result/
+│   │   │   ├── result.component.ts
+│   │   │   ├── result.component.html
+│   ├── services/
+│   │   └── progress.service.ts
+│   ├── app-routing.module.ts
+│   ├── app.component.ts
+│   └── app.module.ts
+```
 
-// -------------------------
-// PART 3: Code Implementation (Selected Files)
-// -------------------------
+## --- FICHIERS COMPLETS ---
 
-// === app-routing.module.ts ===
+### app.module.ts
+```ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HomeComponent } from './components/home/home.component';
+import { CaptchaComponent } from './components/captcha/captcha.component';
+import { ResultComponent } from './components/result/result.component';
+import { ProgressService } from './services/progress.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    CaptchaComponent,
+    ResultComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule
+  ],
+  providers: [ProgressService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### app-routing.module.ts
+```ts
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
-import { CaptchaComponent } from './pages/captcha/captcha.component';
-import { ResultComponent } from './pages/result/result.component';
-import { ChallengeCompleteGuard } from './guards/challenge-complete.guard';
+import { HomeComponent } from './components/home/home.component';
+import { CaptchaComponent } from './components/captcha/captcha.component';
+import { ResultComponent } from './components/result/result.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'captcha', component: CaptchaComponent },
-  { path: 'result', component: ResultComponent, canActivate: [ChallengeCompleteGuard] },
+  { path: 'result', component: ResultComponent },
   { path: '**', redirectTo: '' }
 ];
 
@@ -73,195 +95,176 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+```
 
-
-// === app.module.ts ===
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { HomeComponent } from './pages/home/home.component';
-import { CaptchaComponent } from './pages/captcha/captcha.component';
-import { ResultComponent } from './pages/result/result.component';
-import { ChallengeCompleteGuard } from './guards/challenge-complete.guard';
-import { StoreModule } from '@ngrx/store';
-import { reducers } from './store/reducers';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { StoreRouterConnectingModule } from '@ngrx/router-store';
-import { EffectsModule } from '@ngrx/effects';
-
-@NgModule({
-  declarations: [AppComponent, HomeComponent, CaptchaComponent, ResultComponent],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppRoutingModule,
-    StoreModule.forRoot(reducers),
-    StoreDevtoolsModule.instrument({ maxAge: 25 }),
-    StoreRouterConnectingModule.forRoot(),
-    EffectsModule.forRoot([])
-  ],
-  providers: [ChallengeCompleteGuard],
-  bootstrap: [AppComponent]
-})
-export class AppModule {}
-
-
-// === state.model.ts ===
-export interface AppState {
-  currentStep: number;
-  completed: boolean;
-  challenges: CaptchaResult[];
-}
-
-export interface CaptchaResult {
-  challengeId: number;
-  success: boolean;
-  answer: any;
-}
-
-
-// === state.reducer.ts ===
-import { ActionReducerMap } from '@ngrx/store';
-import { AppState } from '../state.model';
-
-export const initialState: AppState = {
-  currentStep: 0,
-  completed: false,
-  challenges: []
-};
-
-export function appReducer(state = initialState, action: any): AppState {
-  switch (action.type) {
-    case 'NEXT_STEP':
-      return { ...state, currentStep: state.currentStep + 1 };
-    case 'SAVE_CHALLENGE':
-      return {
-        ...state,
-        challenges: [...state.challenges, action.payload]
-      };
-    case 'MARK_COMPLETE':
-      return { ...state, completed: true };
-    default:
-      return state;
-  }
-}
-
-export const reducers: ActionReducerMap<{ app: AppState }> = {
-  app: appReducer
-};
-
-
-// === challenge-complete.guard.ts ===
+### progress.service.ts
+```ts
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { AppState } from '../store/state.model';
-import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
-export class ChallengeCompleteGuard implements CanActivate {
-  constructor(private store: Store<{ app: AppState }>, private router: Router) {}
+export class ProgressService {
+  private progressKey = 'captchaProgress';
 
-  canActivate() {
-    return this.store.select('app').pipe(
-      map(state => {
-        if (state.completed) return true;
-        this.router.navigate(['/captcha']);
-        return false;
-      })
-    );
+  getProgress(): any {
+    const saved = localStorage.getItem(this.progressKey);
+    return saved ? JSON.parse(saved) : { step: 0, answers: [] };
+  }
+
+  setProgress(progress: any): void {
+    localStorage.setItem(this.progressKey, JSON.stringify(progress));
+  }
+
+  resetProgress(): void {
+    localStorage.removeItem(this.progressKey);
   }
 }
+```
 
-
-// === captcha.component.ts (simplified logic) ===
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../store/state.model';
+### home.component.ts
+```ts
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProgressService } from '../../services/progress.service';
 
-@Component({
-  selector: 'app-captcha',
-  templateUrl: './captcha.component.html',
-  styleUrls: ['./captcha.component.scss']
-})
+@Component({ selector: 'app-home', templateUrl: './home.component.html' })
+export class HomeComponent {
+  constructor(private router: Router, private progress: ProgressService) {}
+
+  startChallenge(): void {
+    this.progress.resetProgress();
+    this.router.navigate(['/captcha']);
+  }
+}
+```
+
+### home.component.html
+```html
+<h2>Bienvenue sur Angul-it</h2>
+<button (click)="startChallenge()">Commencer le captcha</button>
+```
+
+### captcha.component.ts
+```ts
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ProgressService } from '../../services/progress.service';
+
+@Component({ selector: 'app-captcha', templateUrl: './captcha.component.html' })
 export class CaptchaComponent implements OnInit {
-  captchaForm!: FormGroup;
-  currentChallenge = 0;
+  step = 0;
+  selected: Set<number> = new Set();
+  challenges = [
+    { question: 'Sélectionnez toutes les images avec des chats', images: ['chat1.jpg', 'chien1.jpg', 'chat2.jpg'], answers: [0, 2] },
+    { question: 'Sélectionnez toutes les images avec des feux', images: ['feu1.jpg', 'eau.jpg', 'feu2.jpg'], answers: [0, 2] }
+  ];
 
-  constructor(
-    private fb: FormBuilder,
-    private store: Store<{ app: AppState }>,
-    private router: Router
-  ) {}
+  constructor(private router: Router, private progress: ProgressService) {}
 
-  ngOnInit(): void {
-    this.captchaForm = this.fb.group({
-      answer: ['', Validators.required]
-    });
+  ngOnInit() {
+    const saved = this.progress.getProgress();
+    this.step = saved.step;
   }
 
-  submit() {
-    if (this.captchaForm.valid) {
-      this.store.dispatch({
-        type: 'SAVE_CHALLENGE',
-        payload: {
-          challengeId: this.currentChallenge,
-          success: true,
-          answer: this.captchaForm.value.answer
-        }
-      });
+  toggleSelect(index: number): void {
+    this.selected.has(index) ? this.selected.delete(index) : this.selected.add(index);
+  }
 
-      this.currentChallenge++;
-      if (this.currentChallenge >= 3) {
-        this.store.dispatch({ type: 'MARK_COMPLETE' });
+  validate(): void {
+    const challenge = this.challenges[this.step];
+    const isValid = challenge.answers.every(i => this.selected.has(i)) &&
+                    this.selected.size === challenge.answers.length;
+
+    if (isValid) {
+      const state = this.progress.getProgress();
+      state.answers.push([...this.selected]);
+      state.step++;
+      this.progress.setProgress(state);
+
+      if (state.step >= this.challenges.length) {
         this.router.navigate(['/result']);
       } else {
-        this.captchaForm.reset();
+        this.selected.clear();
+        this.step++;
       }
+    } else {
+      alert('Réponse incorrecte, veuillez réessayer.');
     }
   }
 }
+```
 
+### captcha.component.html
+```html
+<h3>{{ challenges[step].question }}</h3>
+<div class="grid">
+  <div *ngFor="let img of challenges[step].images; let i = index" (click)="toggleSelect(i)"
+       [class.selected]="selected.has(i)">
+    <img [src]="'assets/' + img" alt="captcha image" />
+  </div>
+</div>
+<button (click)="validate()">Valider</button>
+```
 
-// === result.component.html ===
-<h2>Result</h2>
-<p>Congratulations! You passed the CAPTCHA challenge.</p>
-<button (click)="restart()">Start Over</button>
-
-// === result.component.ts ===
-import { Component } from '@angular/core';
+### result.component.ts
+```ts
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../store/state.model';
+import { ProgressService } from '../../services/progress.service';
 
-@Component({
-  selector: 'app-result',
-  templateUrl: './result.component.html'
-})
-export class ResultComponent {
-  constructor(private store: Store<{ app: AppState }>, private router: Router) {}
+@Component({ selector: 'app-result', templateUrl: './result.component.html' })
+export class ResultComponent implements OnInit {
+  finished = false;
 
-  restart() {
-    this.store.dispatch({ type: 'RESET' });
+  constructor(private router: Router, private progress: ProgressService) {}
+
+  ngOnInit(): void {
+    const state = this.progress.getProgress();
+    if (state.step < 2) {
+      this.router.navigate(['/captcha']);
+    } else {
+      this.finished = true;
+    }
+  }
+
+  restart(): void {
+    this.progress.resetProgress();
     this.router.navigate(['/']);
   }
 }
+```
 
-// Add RESET logic to reducer if needed.
+### result.component.html
+```html
+<div *ngIf="finished">
+  <h2>Félicitations, vous avez terminé le challenge !</h2>
+  <button (click)="restart()">Recommencer</button>
+</div>
+```
 
-// -------------------------
-// PART 4: Conclusion
-// -------------------------
-// The app fulfills the functional audit:
-// - Proper setup
-// - Correct routing/components
-// - Challenge logic with validation
-// - NGRX store for state + page refresh handling
-// - Guard protects result page
-//
-// Let me know if you'd like the full Angular files zipped or exported in another way.
+### styles.scss
+```scss
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.grid div {
+  border: 2px solid gray;
+  cursor: pointer;
+}
+
+.grid div.selected {
+  border-color: green;
+}
+```
+
+### assets (images)
+Placez des images dans `src/assets` avec les noms utilisés (`chat1.jpg`, `chien1.jpg`, etc.).
+
+---
+
+Souhaitez-vous :
+- Ajouter des tests unitaires (Jasmine/Karma) ?
+- Ajouter des animations ou améliorer l’UX/UI ?
+- Internationaliser en français/anglais ?

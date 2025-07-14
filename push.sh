@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-les étapes à suivre
+Angular from zero
 "
 git push gitea
 git push github
