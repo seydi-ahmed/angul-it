@@ -1,12 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ProgressService } from '../../services/progress.service';
 
 @Component({
   selector: 'app-result',
   standalone: true,
-  imports: [],
   templateUrl: './result.component.html',
-  styleUrl: './result.component.scss'
+  styleUrls: ['./result.component.scss'],
+  providers: [ProgressService]
 })
-export class ResultComponent {
+export class ResultComponent implements OnInit {
+  results: any[] = [];
 
+  constructor(private router: Router, private progressService: ProgressService) {}
+
+  ngOnInit() {
+    if (!this.progressService.isCompleted()) {
+      this.router.navigate(['/captcha']);
+      return;
+    }
+    this.results = this.progressService.getAllSteps();
+  }
+
+  restart() {
+    this.progressService.reset();
+    this.router.navigate(['/']);
+  }
 }
