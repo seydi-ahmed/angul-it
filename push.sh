@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-app.config.ts
+components/home/home.component.ts
 "
 git push gitea
 git push github
