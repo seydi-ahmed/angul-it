@@ -1,1 +1,14 @@
-<p>captcha works!</p>
+<div class="captcha-container">
+  <h2>{{ challenges[currentStep].question }}</h2>
+
+  <div class="images-grid">
+    <div *ngFor="let img of challenges[currentStep].images" class="image-wrapper"
+         [class.selected]="isSelected(img)"
+         (click)="toggleImageSelection(img)">
+      <img [src]="'assets/images/' + img" alt="captcha image" />
+    </div>
+  </div>
+
+  <button (click)="previous()" [disabled]="currentStep === 0">Précédent</button>
+  <button (click)="next()">Suivant</button>
+</div>
