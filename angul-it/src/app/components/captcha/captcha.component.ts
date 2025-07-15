@@ -7,16 +7,30 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-captcha',
   standalone: true,
-  imports: [CommonModule],  // <-- ajouter cette ligne
+  imports: [CommonModule],
   templateUrl: './captcha.component.html',
   styleUrls: ['./captcha.component.scss'],
   providers: [ProgressService]
 })
 export class CaptchaComponent {
   currentStep = 0;
+
   challenges = [
-    { question: 'Sélectionnez toutes les images avec un chat', images: ['chat1.jpg', 'chien1.jpg', 'chat2.jpg', 'oiseau1.jpg'] },
-    { question: 'Sélectionnez toutes les images avec un chien', images: ['chien1.jpg', 'chien2.jpg', 'chat1.jpg', 'oiseau2.jpg'] }
+    {
+      type: 'image',
+      question: 'Sélectionnez toutes les images avec un chat',
+      images: ['chat1.jpg', 'chien1.jpg', 'chat2.jpg', 'oiseau1.jpg']
+    },
+    {
+      type: 'math',
+      question: 'Combien font 7 + 5 ?',
+      answer: 12
+    },
+    {
+      type: 'text',
+      question: 'Écrivez le mot suivant : robot',
+      answer: 'robot'
+    }
   ];
 
   form: FormGroup;
@@ -26,15 +40,29 @@ export class CaptchaComponent {
     private progressService: ProgressService,
     private fb: FormBuilder
   ) {
-    this.form = this.fb.group({
-      selectedImages: [[], Validators.required]
-    });
-
-    // Charger étape actuelle depuis le service
     this.currentStep = this.progressService.getCurrentStep();
-    this.form.setValue({
-      selectedImages: this.progressService.getSelectedImages(this.currentStep) || []
-    });
+    const challenge = this.challenges[this.currentStep];
+    this.form = this.createForm(challenge);
+  }
+
+  createForm(challenge: any): FormGroup {
+    const savedValue = this.progressService.getAnswer(this.currentStep);
+    switch (challenge.type) {
+      case 'image':
+        return this.fb.group({
+          selectedImages: [savedValue || [], Validators.required]
+        });
+      case 'math':
+        return this.fb.group({
+          mathAnswer: [savedValue || '', [Validators.required]]
+        });
+      case 'text':
+        return this.fb.group({
+          textAnswer: [savedValue || '', [Validators.required]]
+        });
+      default:
+        return this.fb.group({});
+    }
   }
 
   toggleImageSelection(img: string) {
@@ -52,17 +80,23 @@ export class CaptchaComponent {
 
   next() {
     if (this.form.invalid) {
-      alert('Veuillez sélectionner au moins une image');
+      alert('Veuillez compléter le challenge avant de continuer');
       return;
     }
 
-    this.progressService.saveStep(this.currentStep, this.form.value.selectedImages);
+    const challenge = this.challenges[this.currentStep];
+    const value =
+      challenge.type === 'image'
+        ? this.form.value.selectedImages
+        : challenge.type === 'math'
+          ? this.form.value.mathAnswer
+          : this.form.value.textAnswer;
+
+    this.progressService.saveAnswer(this.currentStep, value);
 
     if (this.currentStep + 1 < this.challenges.length) {
       this.currentStep++;
-      this.form.setValue({
-        selectedImages: this.progressService.getSelectedImages(this.currentStep) || []
-      });
+      this.form = this.createForm(this.challenges[this.currentStep]);
     } else {
       this.router.navigate(['/result']);
     }
@@ -71,9 +105,7 @@ export class CaptchaComponent {
   previous() {
     if (this.currentStep > 0) {
       this.currentStep--;
-      this.form.setValue({
-        selectedImages: this.progressService.getSelectedImages(this.currentStep) || []
-      });
+      this.form = this.createForm(this.challenges[this.currentStep]);
     }
   }
 }

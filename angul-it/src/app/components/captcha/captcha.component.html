@@ -1,7 +1,8 @@
 <h2>{{ challenges[currentStep].question }}</h2>
 
-<div class="image-grid">
-  <div 
+<!-- Type: Image -->
+<div *ngIf="challenges[currentStep].type === 'image'" class="image-grid">
+  <div
     *ngFor="let img of challenges[currentStep].images"
     [class.selected]="isSelected(img)"
     (click)="toggleImageSelection(img)"
@@ -9,6 +10,16 @@
   >
     <img [src]="'assets/images/' + img" [alt]="img" />
   </div>
+</div>
+
+<!-- Type: Math -->
+<div *ngIf="challenges[currentStep].type === 'math'">
+  <input type="number" formControlName="mathAnswer" placeholder="Votre réponse" />
+</div>
+
+<!-- Type: Text -->
+<div *ngIf="challenges[currentStep].type === 'text'">
+  <input type="text" formControlName="textAnswer" placeholder="Votre réponse" />
 </div>
 
 <div class="buttons">
