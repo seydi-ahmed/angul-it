@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { ProgressService } from '../../services/progress.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-captcha',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './captcha.component.html',
   styleUrls: ['./captcha.component.scss'],
   providers: [ProgressService]
@@ -33,7 +34,7 @@ export class CaptchaComponent {
     }
   ];
 
-  form: FormGroup;
+  form!: FormGroup;
 
   constructor(
     private router: Router,
@@ -41,27 +42,29 @@ export class CaptchaComponent {
     private fb: FormBuilder
   ) {
     this.currentStep = this.progressService.getCurrentStep();
-    const challenge = this.challenges[this.currentStep];
-    this.form = this.createForm(challenge);
+    this.initForm();
   }
 
-  createForm(challenge: any): FormGroup {
-    const savedValue = this.progressService.getAnswer(this.currentStep);
+  initForm() {
+    const challenge = this.challenges[this.currentStep];
+    const saved = this.progressService.getAnswer(this.currentStep);
+
     switch (challenge.type) {
       case 'image':
-        return this.fb.group({
-          selectedImages: [savedValue || [], Validators.required]
+        this.form = this.fb.group({
+          selectedImages: [saved || [], Validators.required]
         });
+        break;
       case 'math':
-        return this.fb.group({
-          mathAnswer: [savedValue || '', [Validators.required]]
+        this.form = this.fb.group({
+          mathAnswer: [saved || '', Validators.required]
         });
+        break;
       case 'text':
-        return this.fb.group({
-          textAnswer: [savedValue || '', [Validators.required]]
+        this.form = this.fb.group({
+          textAnswer: [saved || '', Validators.required]
         });
-      default:
-        return this.fb.group({});
+        break;
     }
   }
 
@@ -85,18 +88,37 @@ export class CaptchaComponent {
     }
 
     const challenge = this.challenges[this.currentStep];
-    const value =
-      challenge.type === 'image'
-        ? this.form.value.selectedImages
-        : challenge.type === 'math'
-          ? this.form.value.mathAnswer
-          : this.form.value.textAnswer;
+    let value;
+
+    if (challenge.type === 'image') {
+      value = this.form.value.selectedImages;
+    } else if (challenge.type === 'math') {
+      const expected = challenge.answer;
+      const user = parseInt(this.form.value.mathAnswer, 10);
+      if (user !== expected) {
+        alert('Mauvaise réponse. Essayez encore.');
+        return;
+      }
+      value = user;
+    } else if (challenge.type === 'text') {
+      const expected = typeof challenge.answer === 'string'
+        ? challenge.answer.trim().toLowerCase()
+        : String(challenge.answer).toLowerCase();
+
+      const user = this.form.value.textAnswer.trim().toLowerCase();
+      if (user !== expected) {
+        alert('Texte incorrect. Essayez encore.');
+        return;
+      }
+      value = user;
+    }
+
 
     this.progressService.saveAnswer(this.currentStep, value);
 
     if (this.currentStep + 1 < this.challenges.length) {
       this.currentStep++;
-      this.form = this.createForm(this.challenges[this.currentStep]);
+      this.initForm();
     } else {
       this.router.navigate(['/result']);
     }
@@ -105,7 +127,7 @@ export class CaptchaComponent {
   previous() {
     if (this.currentStep > 0) {
       this.currentStep--;
-      this.form = this.createForm(this.challenges[this.currentStep]);
+      this.initForm();
     }
   }
 }

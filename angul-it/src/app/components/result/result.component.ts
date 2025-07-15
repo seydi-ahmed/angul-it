@@ -6,13 +6,18 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-result',
   standalone: true,
-  imports: [CommonModule],  // <-- ajouter cette ligne
+  imports: [CommonModule],
   templateUrl: './result.component.html',
   styleUrls: ['./result.component.scss'],
   providers: [ProgressService]
 })
 export class ResultComponent implements OnInit {
   results: any[] = [];
+  challenges = [
+    { type: 'image', label: 'Images sélectionnées' },
+    { type: 'math', label: 'Réponse mathématique' },
+    { type: 'text', label: 'Réponse textuelle' }
+  ];
 
   constructor(private router: Router, private progressService: ProgressService) {}
 
@@ -27,5 +32,9 @@ export class ResultComponent implements OnInit {
   restart() {
     this.progressService.reset();
     this.router.navigate(['/']);
+  }
+
+  isArray(val: any): boolean {
+    return Array.isArray(val);
   }
 }

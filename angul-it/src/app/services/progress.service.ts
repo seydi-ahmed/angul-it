@@ -8,16 +8,16 @@ export class ProgressService {
 
   saveAnswer(step: number, answer: any) {
     const data = this.getAllSteps();
-    data[step] = answer;
+    data[step] = Array.isArray(answer) ? answer : [answer];
     localStorage.setItem(this.storageKey, JSON.stringify(data));
   }
 
   getAnswer(step: number): any {
     const data = this.getAllSteps();
-    return data[step] || null;
+    return data[step]?.length === 1 ? data[step][0] : data[step];
   }
 
-  getAllSteps(): any[] {
+  getAllSteps(): any[][] {
     const stored = localStorage.getItem(this.storageKey);
     return stored ? JSON.parse(stored) : [];
   }
@@ -29,7 +29,7 @@ export class ProgressService {
 
   isCompleted(): boolean {
     const data = this.getAllSteps();
-    return data.length === 3;
+    return data.length === 3; // change if you add more challenges
   }
 
   reset() {

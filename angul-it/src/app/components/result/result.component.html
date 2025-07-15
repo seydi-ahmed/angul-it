@@ -1,10 +1,10 @@
 <div class="result-container">
-  <h1>Résultats du Captcha</h1>
+  <h1>🎉 Félicitations, vous avez terminé le Captcha !</h1>
 
   <div *ngFor="let res of results; let i = index">
     <h3>Challenge {{ i + 1 }}</h3>
-    <p>Images sélectionnées: {{ res.join(', ') }}</p>
+    <p>{{ challenges[i].label }} : {{ isArray(res) ? res.join(', ') : res }}</p>
   </div>
 
-  <button (click)="restart()">Recommencer</button>
+  <button (click)="restart()"> Recommencer</button>
 </div>
