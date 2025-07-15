@@ -68,6 +68,6 @@ npm start
 
 ## 👤 Auteur
 **Mouhamed Diouf**  
-📧 [diouf.mouhamed3@ugb.edu.sn](mailto:seydiahmedelcheikh@gmail.com)  
+📧 [seydiahmedelcheikh@gmail.com](mailto:seydiahmedelcheikh@gmail.com)  
 📞 +221 77 622 16 81  
 🔗 [GitHub - seydi-ahmed](https://github.com/seydi-ahmed)
