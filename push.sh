@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-mise en forme terminée
+Readme OK
 "
 git push gitea
 git push github
