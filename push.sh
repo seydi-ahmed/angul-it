@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-Readme OK
+src/main.ts
 "
 git push gitea
 git push github

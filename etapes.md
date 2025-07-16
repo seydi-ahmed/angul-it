@@ -18,3 +18,10 @@ ng generate component components/result
 # Créer un service pour la gestion d'état
 ng generate service services/progress
 ```
+
+## --- Explications des fichiers ---
+1) src/main.ts:
+- le tout premier fichier exécuté par Angular lors du démarrage de l'application: le point d'entrée de l'application
+- il importe le composant racine et la config
+- il lance l'appli avec bootstrapApplication()
+- il gère les erreurs si ça plante au démarrage
