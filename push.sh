@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-src/main.ts
+main.server.ts
 "
 git push gitea
 git push github

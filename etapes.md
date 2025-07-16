@@ -25,3 +25,9 @@ ng generate service services/progress
 - il importe le composant racine et la config
 - il lance l'appli avec bootstrapApplication()
 - il gère les erreurs si ça plante au démarrage
+
+2) main.server.ts:
+- le point d'entrée server de l'application
+- il sert à démarrer Angular en mode **rendu coté server**
+- il utilise une configuration différente de celle du client (app.config.server.ts)
+- il exporte une fonction que le serveur Angular appelle quand il rend une page pour un utilisateur
