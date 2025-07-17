@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-main.server.ts
+app.component.ts
 "
 git push gitea
 git push github

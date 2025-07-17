@@ -31,3 +31,15 @@ ng generate service services/progress
 - il sert à démarrer Angular en mode **rendu coté server**
 - il utilise une configuration différente de celle du client (app.config.server.ts)
 - il exporte une fonction que le serveur Angular appelle quand il rend une page pour un utilisateur
+
+3) app.components.ts:
+- le composant racine de l'application
+| Élément                     | Rôle                                                       |
+| --------------------------- | ---------------------------------------------------------- |
+| `selector`                  | Déclare le nom HTML personnalisé (`<app-root>`)            |
+| `standalone: true`          | Pas besoin de module                                       |
+| `imports`                   | Indique qu’on utilise `RouterOutlet` pour gérer les routes |
+| `templateUrl` / `styleUrls` | Lie le HTML et SCSS associés                               |
+| `title`                     | Une simple variable de test                                |
+
+4) 
