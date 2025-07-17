@@ -145,4 +145,9 @@ export class CaptchaComponent {
       this.initForm();
     }
   }
+
+  getProgressPercentage(): number {
+    return ((this.currentStep + 1) / this.challenges.length) * 100;
+  }
+
 }

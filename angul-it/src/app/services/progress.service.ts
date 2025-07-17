@@ -1,12 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable()
 export class ProgressService {
   private storageKey = 'angulItProgress';
 
-  constructor() {}
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
+
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
   saveAnswer(step: number, answer: any) {
+    if (!this.isBrowser()) return;
     const data = this.getAllSteps();
     data[step] = Array.isArray(answer) ? answer : [answer];
     localStorage.setItem(this.storageKey, JSON.stringify(data));
@@ -18,6 +24,7 @@ export class ProgressService {
   }
 
   getAllSteps(): any[][] {
+    if (!this.isBrowser()) return [];
     const stored = localStorage.getItem(this.storageKey);
     return stored ? JSON.parse(stored) : [];
   }
@@ -29,10 +36,11 @@ export class ProgressService {
 
   isCompleted(): boolean {
     const data = this.getAllSteps();
-    return data.length === 3; // change if you add more challenges
+    return data.length === 3; // Change if you add more challenges
   }
 
   reset() {
+    if (!this.isBrowser()) return;
     localStorage.removeItem(this.storageKey);
   }
 }

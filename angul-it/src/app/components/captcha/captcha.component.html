@@ -1,3 +1,9 @@
+<!-- Progress bar -->
+<div class="progress-wrapper">
+  <div class="progress-bar" [style.width.%]="getProgressPercentage()"></div>
+</div>
+<p class="progress-text">Étape {{ currentStep + 1 }} / {{ challenges.length }}</p>
+
 <form [formGroup]="form">
   <h2>{{ challenges[currentStep].question }}</h2>
 
