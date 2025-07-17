@@ -1,6 +1,6 @@
 git add .
 git commit -m "
-app.component.ts
+correction du captcha
 "
 git push gitea
 git push github

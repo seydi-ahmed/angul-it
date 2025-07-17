@@ -20,7 +20,8 @@ export class CaptchaComponent {
     {
       type: 'image',
       question: 'Sélectionnez toutes les images avec un chat',
-      images: ['chat1.jpg', 'chien1.jpg', 'chat2.jpg', 'oiseau1.jpg']
+      images: ['chat1.jpg', 'chien1.jpg', 'chat2.jpg', 'oiseau1.jpg'],
+      answer: ['chat1.jpg', 'chat2.jpg']
     },
     {
       type: 'math',
@@ -91,7 +92,20 @@ export class CaptchaComponent {
     let value;
 
     if (challenge.type === 'image') {
-      value = this.form.value.selectedImages;
+      const selected = this.form.value.selectedImages as string[];
+      const expected = challenge.answer as string[];
+
+      const isCorrect =
+        selected.length === expected.length &&
+        selected.every((img: string) => expected.includes(img));
+
+      if (!isCorrect) {
+        alert('Mauvaise sélection. Essayez encore.');
+        return;
+      }
+
+      value = selected;
+
     } else if (challenge.type === 'math') {
       const expected = challenge.answer;
       const user = parseInt(this.form.value.mathAnswer, 10);
@@ -100,6 +114,7 @@ export class CaptchaComponent {
         return;
       }
       value = user;
+
     } else if (challenge.type === 'text') {
       const expected = typeof challenge.answer === 'string'
         ? challenge.answer.trim().toLowerCase()
@@ -113,7 +128,6 @@ export class CaptchaComponent {
       value = user;
     }
 
-
     this.progressService.saveAnswer(this.currentStep, value);
 
     if (this.currentStep + 1 < this.challenges.length) {
@@ -123,6 +137,7 @@ export class CaptchaComponent {
       this.router.navigate(['/result']);
     }
   }
+
 
   previous() {
     if (this.currentStep > 0) {
